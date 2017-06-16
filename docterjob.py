@@ -12,7 +12,7 @@ sys.setdefaultencoding('utf-8')
 
 # root_url为爬取网站，urls_url为信息列表（为获取url）
 root_url = 'http://www.doctorjob.com.cn'
-urls_url = root_url + '/public/J1600Z109Z103_A0300Z1100Z1400_T2_P'
+urls_url = ['/public/J1600Z109Z103_A0300Z1100Z1400_T2_P','/public/J1018Z1006Z100_A1500Z2600Z2700_T100_P']
 
 # 获取页面数据并存储成数组
 def get_single_page_info(singleurl):
@@ -76,7 +76,6 @@ def get_single_page_info(singleurl):
         data.append([a.string for a in soup.select('p.process_titlein')][0])
     else:
         data.append("")
-
     # 属性
     if len(soup.select('div.postion_title_r img[src=/images/position/icom_leftin.png]')) == 1:
         tp = [a.string for a in soup.select('div.postion_title_r img[src=/images/position/icom_leftin.png]')][0]
@@ -104,22 +103,35 @@ def get_single_page_info(singleurl):
 
 # 获取爬去页面的连接
 pageurl = []
-def get_page_urls(num):
-    res = requests.get(urls_url+str(num)+'/')
+def get_page_urls(num,un):
+    res = requests.get(root_url+urls_url[un]+str(num)+'/')
     # if res.status_code == 200:
-    if num < 35:
+    max_num = get_max_num(root_url+urls_url[un])
+    if num <= max_num:
         info = "正在爬取第"+str(num)+"个网页链接"
         print(info.decode("utf-8"))
         urlsoup = bs4.BeautifulSoup(res.content,"html.parser")
         pageurl.extend([a.attrs.get('href') for a in urlsoup.select('span.job_name a[href^=/resume]')])
-        get_page_urls(num+1)
+        get_page_urls(num+1,un)
     else:
-        pass
+        if len(urls_url) > un+1:
+            print("second_page_url")
+            get_page_urls(1,un+1)
+        else:
+            pass
+
+# 获取最大列表链接数目
+def get_max_num(url):
+    res = requests.get(url+'1/')
+    urlsoup = bs4.BeautifulSoup(res.content,"html.parser")
+    lasturl = [a.attrs.get('href') for a in urlsoup.select('div.fanye a[href^=/public]')][-1]
+    max_str = re.findall(r'_P(.+?)/',lasturl)
+    return int(max_str[0])
 
 # 并发处理
 def multi_processing():
     pool = Pool(8)
-    get_page_urls(1)
+    get_page_urls(1,0)
     results = pool.map(get_single_page_info, pageurl)
     with open('data.csv', 'wb') as csvfile:  
         spamwriter = csv.writer(csvfile, dialect='excel')  
