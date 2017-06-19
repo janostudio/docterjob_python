@@ -12,7 +12,46 @@ sys.setdefaultencoding('utf-8')
 
 # root_url为爬取网站，urls_url为信息列表（为获取url）
 root_url = 'http://www.doctorjob.com.cn'
-urls_url = ['/public/J1600Z109Z103_A0300Z1100Z1400_T2_P','/public/J1018Z1006Z100_A1500Z2600Z2700_T100_P']
+urls_url = ['/public/J1018Z1006Z100_A0300Z1100Z1400_T2_P', 
+'/public/J1600Z109Z103_A0300Z1100Z1400_T2_P', 
+'/public/J1200Z1400Z1029_A0300Z1100Z1400_T2_P', 
+'/public/J9900Z1500_A0300Z1100Z1400_T2_P', 
+'/public/J9900Z1500_A1500Z2600Z2700_T2_P', 
+'/public/J1029Z1400Z1200_A1500Z2600Z2700_T2_P', 
+'/public/J103Z109Z1600_A1500Z2600Z2700_T2_P', 
+'/public/J1018Z1006Z100_A1500Z2600Z2700_T2_P', 
+'/public/J1018Z1006Z100_A3400Z0700Z1000_T2_P', 
+'/public/J1600Z109Z103_A3400Z0700Z1000_T2_P', 
+'/public/J1200Z1400Z1029_A3400Z0700Z1000_T2_P', 
+'/public/J9900Z1500_A3400Z0700Z1000_T2_P', 
+'/public/J1029Z1400Z1200_A1300Z1600Z1700_T2_P', 
+'/public/J9900Z1500_A1300Z1600Z1700_T2_P', 
+'/public/J103Z109Z1600_A1300Z1600Z1700_T2_P', 
+'/public/J100Z1006Z1018_A1300Z1600Z1700_T2_P', 
+'/public/J100Z1006Z1018_A1800Z1900Z2200_T2_P', 
+'/public/J1600Z109Z103_A1800Z1900Z2200_T2_P', 
+'/public/J1200Z1400Z1029_A1800Z1900Z2200_T2_P', 
+'/public/J9900Z1500_A1800Z1900Z2200_T2_P', 
+'/public/J9900Z1500_A2400Z0900Z1200_T2_P', 
+'/public/J1029Z1400Z1200_A2400Z0900Z1200_T2_P', 
+'/public/J103Z109Z1600_A2400Z0900Z1200_T2_P', 
+'/public/J1018Z1006Z100_A2400Z0900Z1200_T2_P', 
+'/public/J1018Z1006Z100_A2000Z2100Z2300_T2_P', 
+'/public/J1600Z109Z103_A2000Z2100Z2300_T2_P', 
+'/public/J1200Z1400Z1029_A2000Z2100Z2300_T2_P', 
+'/public/J9900Z1500_A2000Z2100Z2300_T2_P', 
+'/public/J9900Z1500_A2800Z2900Z3200_T2_P', 
+'/public/J1029Z1400Z1200_A2800Z2900Z3200_T2_P', 
+'/public/J103Z109Z1600_A2800Z2900Z3200_T2_P', 
+'/public/J1018Z1006Z100_A2800Z2900Z3200_T2_P', 
+'/public/J1018Z1006Z100_A0800Z2500Z3000_T2_P', 
+'/public/J1600Z109Z103_A0800Z2500Z3000_T2_P', 
+'/public/J1200Z1400Z1029_A0800Z2500Z3000_T2_P', 
+'/public/J9900Z1500_A0800Z2500Z3000_T2_P', 
+'/public/J9900Z1500_A3300Z3500_T2_P', 
+'/public/J1029Z1400Z1200_A3300Z3500_T2_P', 
+'/public/J109Z103Z1600_A3300Z3500_T2_P', 
+'/public/J1018Z1006Z100_A3300Z3500_T2_P']
 
 # 获取页面数据并存储成数组
 def get_single_page_info(singleurl):
@@ -125,9 +164,12 @@ def get_page_urls(num,un):
 def get_max_num(url):
     res = requests.get(url+'1/')
     urlsoup = bs4.BeautifulSoup(res.content,"html.parser")
-    lasturl = [a.attrs.get('href') for a in urlsoup.select('div.fanye a[href^=/public]')][-1]
-    max_str = re.findall(r'_P(.+?)/',lasturl)
-    return int(max_str[0])
+    if len(urlsoup.select('div.fanye a[href^=/public]')) > 0:
+        lasturl = [a.attrs.get('href') for a in urlsoup.select('div.fanye a[href^=/public]')][-1]
+        max_str = re.findall(r'_P(.+?)/',lasturl)
+        return int(max_str[0])
+    else:
+        return 0
 
 # 并发处理
 def multi_processing():
