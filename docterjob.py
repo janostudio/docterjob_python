@@ -99,6 +99,7 @@ def get_single_page_info(singleurl):
         data.append([a.string for a in soup.select('div.postion_title_r span[title]')][0])
     else:
         data.append("")
+    # print(singleurl)
     return data
 
 # 获取爬去页面的连接
