@@ -12,10 +12,10 @@ sys.setdefaultencoding('utf-8')
 
 # root_url为爬取网站，urls_url为信息列表（为获取url）
 root_url = 'http://www.doctorjob.com.cn'
-urls_url = ['/public/J1018Z1006Z100_A0300Z1100Z1400_T2_P', 
-'/public/J1600Z109Z103_A0300Z1100Z1400_T2_P', 
+urls_url = [ '/public/J9900Z1500_A0300Z1100Z1400_T2_P',
+'/public/J1018Z1006Z100_A0300Z1100Z1400_T2_P', 
 '/public/J1200Z1400Z1029_A0300Z1100Z1400_T2_P', 
-'/public/J9900Z1500_A0300Z1100Z1400_T2_P', 
+'/public/J1600Z109Z103_A0300Z1100Z1400_T2_P', 
 '/public/J9900Z1500_A1500Z2600Z2700_T2_P', 
 '/public/J1029Z1400Z1200_A1500Z2600Z2700_T2_P', 
 '/public/J103Z109Z1600_A1500Z2600Z2700_T2_P', 
@@ -138,8 +138,9 @@ def get_single_page_info(singleurl):
         data.append([a.string for a in soup.select('div.postion_title_r span[title]')][0])
     else:
         data.append("")
-    # print(singleurl)
-    return data
+    # print(type(data))
+    # return data
+    write_in_csv(data)
 
 # 获取爬去页面的连接
 pageurl = []
@@ -175,16 +176,18 @@ def get_max_num(url):
 def multi_processing():
     pool = Pool(8)
     get_page_urls(1,0)
-    results = pool.map(get_single_page_info, pageurl)
-    with open('data.csv', 'wb') as csvfile:  
+    pool.map(get_single_page_info, pageurl)
+    # results = pool.map(get_single_page_info, pageurl)  
+
+# 写入csv文件
+def write_in_csv(info):
+    with open('data.csv', 'a') as csvfile:  
         spamwriter = csv.writer(csvfile, dialect='excel')  
         #设置标题  
-        spamwriter.writerow(['job','city','req','edu','keshi','intro','company','salary','time','type','guimo','need','address'])  
+        # spamwriter.writerow(['job','city','req','edu','keshi','intro','company','salary','time','type','guimo','need','address'])  
         #将CsvData中的数据循环写入到CsvFileName文件中  
-        print("write in csv")
-        for item in results: 
-            spamwriter.writerow(item)  
-
+        print("write in")
+        spamwriter.writerow(info)
     
 
 if __name__ == '__main__':
